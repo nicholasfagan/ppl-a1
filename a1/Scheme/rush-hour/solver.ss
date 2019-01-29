@@ -17,6 +17,42 @@
           (rush-hour state)
          (rush-hour utils))
 
+
+;loops from start to end, calling (func i)
+(define (iter-loop start end func)
+	(if (< start end)
+			(begin (func start) (iter-loop (+ 1 start) end func))))
+
+;generate all moves from a given state-moves-pair.
+(define (moves smp)
+	(iter-loop 0 64 (lambda (pos) 
+		(if (state-is-end? (car smp) pos)
+				(begin 
+				(if (state-is-horizontal? (car smp) pos)
+						(begin 
+						(iter-loop 1 5 (lambda (k)
+								(
+								 ;check each move is valid state
+								 )))
+						(iter-loop 1 5 (lambda (k)
+								(
+								 ;check moving backwards
+								 )))))
+				(if (state-is-vertical? (car smp) pos)
+						(begin 
+						(iter-loop 1 5 (lambda (k)
+								(
+								 ;check each move is valid state
+								 )))
+						(iter-loop 1 5 (lambda (k)
+								(
+								 ;check moving backwards
+								 )))))
+						))))))
+
+
+
+
 ;takes in a list of state-moves pairs and a list of previous states.
 ;finds all neighboring states
 ;returns a list of pairs like 
@@ -41,22 +77,22 @@
 		)
 
 
+(define (get-sol lst-neighbors) 
+	(fold-right (lambda (prev smp)
+								(if (and smp (state-is solved? (car smp)))
+										(cdr smp)
+										prev)) 
+							#f
+							neightbors))
+
 	; main loop for solving. takes in old states and new states.
 	; returns list of moves or #f.
 	; it is an implementation of a Breadth First Search.
 	; Nick Fagan nfagan@dal.ca
 	(define (next-step visited neighbors) 
 			;check each neighbor.
-			(let ([sol 
-							(fold-right 
-								(lambda (prev smp) 
-									(if (and smp (state-is-solved? (car smp)))
-										(cdr smp)
-										prev))
-								#f
-								neighbors)])
-				(if sol
-					sol
+			(let ([sol (get-sol neighbors)])
+				(if sol sol
 					(let* ([newvisited  (append visited (map car neighbors))]
 								 ;add newly visited (only the state)
 						[newneighbors ; all neighboring states
