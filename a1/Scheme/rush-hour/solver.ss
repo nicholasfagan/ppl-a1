@@ -17,51 +17,33 @@
           (rush-hour state)
          (rush-hour utils))
 
-
-;loops from start to end, calling (func i)
-(define (iter-loop start end func)
-	(if (< start end)
-			(begin (func start) (iter-loop (+ 1 start) end func))))
-
-;generate all moves from a given state-moves-pair.
-(define (moves smp)
-	(iter-loop 0 64 (lambda (pos) 
-		(if (state-is-end? (car smp) pos)
-				(begin 
-				(if (state-is-horizontal? (car smp) pos)
-						(begin 
-						(iter-loop 1 5 (lambda (k)
-								(
-								 ;check each move is valid state
-								 )))
-						(iter-loop 1 5 (lambda (k)
-								(
-								 ;check moving backwards
-								 )))))
-				(if (state-is-vertical? (car smp) pos)
-						(begin 
-						(iter-loop 1 5 (lambda (k)
-								(
-								 ;check each move is valid state
-								 )))
-						(iter-loop 1 5 (lambda (k)
-								(
-								 ;check moving backwards
-								 )))))
-						))))))
-
 (define (moves-outer-loop smp pos lst)
 	(if (< pos 65)
 		(if (state-is-end? (car smp) pos);1 is k
 				(moves-outer-loop smp (+ 1 pos) 
-													(moves-vertical-loop smp pos 
-																							 (moves-horizontal-loop smp pos lst 1) 1))
+					(moves-vertical-loop smp pos 
+						(moves-horizontal-loop smp pos lst -4) 1));we go from -4 to plus 4, skipping 0.
 				(moves-outer-loop smp (+ 1 pos) lst))
 		lst))
 (define (moves-horizontal-loop smp pos lst k)
-	(if (< k 5)
-			()
+	(if (< k 5); we need a way to skip when k is 0
+			(
+			 ;needs to generate a new state with (state-make-move pos k)
+			 ;check if that state is true.
+			 ; if it is true, cons that state onto the lst,
+			 ; and call this function again with increased k and the new lst.
+			 )
 			lst))
+(define (moves-vertical-smp pos lst k)
+	(if (< k 5); we need a way to skip when k is 0
+			(
+			 ;needs to generate a new state with (state-make-move pos k)
+			 ;check if that state is true.
+			 ; if it is true, cons that state onto the lst,
+			 ; and call this function again with increased k and the new lst.
+			 )
+			lst))
+
 
 
 ;takes in a list of state-moves pairs and a list of previous states.
@@ -82,12 +64,12 @@
 	; Nick Fagan nfagan@dal.ca
   (define (solve-puzzle puzzle)
 		(let* ([state (state-from-string-rep puzzle)];get the state
-					[visited '()];we havent visited anything yet
+					[visited (make-hashtable equal-hash equal? 1000)];we havent visited anything yet
 					[neighbors (list state)]); we are looking at the starting position
 			(next-step visited neighbors));call the main loop with the starting parameters.
 		)
 
-
+;this function gets
 (define (get-sol lst-neighbors) 
 	(fold-right (lambda (prev smp)
 								(if (and smp (state-is solved? (car smp)))
@@ -104,10 +86,8 @@
 			;check each neighbor.
 			(let ([sol (get-sol neighbors)])
 				(if sol sol
-					(let* ([newvisited  (append visited (map car neighbors))]
+					(let* ([newvisited  (append visited (map car neighbors)]
 								 ;add newly visited (only the state)
 						[newneighbors ; all neighboring states
-							(filter (lambda (smp) ;smp = state-moves-pair
-								(not (member visited (car smp)))) 
-								(get-new-neighbors neighbors))]); excluding visited states.
+								(get-new-neighbors neighbors visited)]); excluding visited states.
 						(next-step newvisited newneighbors))))))
