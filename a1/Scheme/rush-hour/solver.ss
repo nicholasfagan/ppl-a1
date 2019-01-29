@@ -50,7 +50,18 @@
 								 )))))
 						))))))
 
-
+(define (moves-outer-loop smp pos lst)
+	(if (< pos 65)
+		(if (state-is-end? (car smp) pos);1 is k
+				(moves-outer-loop smp (+ 1 pos) 
+													(moves-vertical-loop smp pos 
+																							 (moves-horizontal-loop smp pos lst 1) 1))
+				(moves-outer-loop smp (+ 1 pos) lst))
+		lst))
+(define (moves-horizontal-loop smp pos lst k)
+	(if (< k 5)
+			()
+			lst))
 
 
 ;takes in a list of state-moves pairs and a list of previous states.
