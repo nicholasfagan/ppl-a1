@@ -17,10 +17,12 @@
           (rush-hour state)
          (rush-hour utils))
 
-(define (moves smp) (moves-outer-loop smp 0 '()))
+(define (moves smp)
+	(begin ;(display "moves: ") (newline) (pretty-print (car smp)) (newline) (display (cdr smp)) (newline) (newline)
+		(moves-outer-loop smp 0 '())))
 
 (define (moves-outer-loop smp pos lst)
-	(begin ;(display "moves-outer-loop ")  (newline) (display smp) (newline) (display pos) (newline) (display lst) (newline) (newline)
+	(begin ;(display "moves-outer-loop ")  (newline) (display (car smp)) (newline) (display (cdr smp)) (display pos) (newline) (display lst) (newline) (newline)
 	(if (< pos 64)
 			(if (state-is-end? (car smp) pos)
 					(moves-outer-loop smp (+ 1 pos) ;cont lst below
@@ -93,7 +95,7 @@
   (define (solve-puzzle puzzle)
 		(let* ([state (state-from-string-rep puzzle)];get the state
 					[visited (make-hashtable equal-hash equal? 1000)];we havent visited anything yet
-					[neighbors (list (list state))]); we are looking at the starting position
+					[neighbors (list (list state ))]); list of smp, since smp is a list, and we have no moves, this is a list of a list of state
 			(next-step visited neighbors));call the main loop with the starting parameters.
 		)
 
@@ -105,7 +107,7 @@
 	(if (null? neighbors)
 			#f
 			(if (state-is-solved? (caar neighbors))
-					(cadr neighbors)
+					(car neighbors); the smp
 					(get-sol (cdr neighbors)))))
 
 	; main loop for solving. takes in old states and new states.
@@ -116,10 +118,10 @@
 			;check each neighbor.
 			(let ([sol (get-sol neighbors)])
 				(if sol 
-					(begin ;(display "Solution: ") (display sol) (newline)
-						(cdr sol))
+					(begin ;(display "Solution: ") (pretty-print (car sol)) (newline)
+						(reverse (cdr sol)))
 					(begin
-						;(display "Current Neighbors: ") (display neighbors) (newline)
+						;(display "Current Neighbors: ")  (for-each pretty-print (map car neighbors)) (newline)
 						;(display "Current Visited: ") (display (hashtable-keys visited)) (newline)
 						;(newline)
 						(next-step visited (get-new-neighbors visited neighbors))
