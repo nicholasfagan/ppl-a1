@@ -17,59 +17,102 @@
           (rush-hour state)
          (rush-hour utils))
 
-(define (moves smp)
-	(begin ;(display "moves: ") (newline) (pretty-print (car smp)) (newline) (display (cdr smp)) (newline) (newline)
-		(moves-outer-loop smp 0 '())))
 
-(define (moves-outer-loop smp pos lst)
-	(begin ;(display "moves-outer-loop ")  (newline) (display (car smp)) (newline) (display (cdr smp)) (display pos) (newline) (display lst) (newline) (newline)
-	(if (< pos 64)
-			(if (state-is-end? (car smp) pos)
-					(moves-outer-loop smp (+ 1 pos) ;cont lst below
-						(if (state-is-horizontal? (car smp) pos)
-								(moves-horizontal-loop smp pos lst -4)
-								(if (state-is-vertical? (car smp) pos)
-										(moves-vertical-loop smp pos lst -4)
-										lst)))
-					(moves-outer-loop smp (+ 1 pos) lst))
-			lst)
-	))
+(define positions '(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63))
+(define offsets '(-4 -3 -2 -1 1 2 3 4))
 
-(define (moves-horizontal-loop smp pos lst offset)
-	(begin ;(display "moves-horizontal-loop ") (newline) (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
-	(if (= 0 offset)
-			(moves-horizontal-loop smp pos lst (+ 1 offset))
-			(if (< offset 5)
-					(if (state-horizontal-move (car smp) pos offset)
-							(moves-horizontal-loop smp pos 
-								(cons 
-									(cons 
-										(state-horizontal-move (car smp) pos offset) 
-										(cons 
-											(state-make-move pos offset) 
-											(cdr smp))) 
-									lst) 
-								(+ 1 offset))
-							(moves-horizontal-loop smp pos lst (+ 1 offset)))
-					lst))))
+(define (moves smp); get all moves for current state
+	(filter (lambda (x) x ) (apply append (map 
+		(lambda 
+			(pos) ;from each end position
+			(if 
+				(state-is-horizontal? (car smp) pos)
+				(map 
+					(lambda 
+						(offset)
+						(if; get all horizontal moves on this position
+							(state-horizontal-move (car smp) pos offset)
+							(cons 
+								(state-horizontal-move (car smp) pos offset)
+								(cons
+									(state-make-move pos offset)
+									(cdr smp)))
+							#f))
+					offsets)
+				(map 
+					(lambda 
+						(offset)
+						(if; get all vertical moves on this position
+							(state-vertical-move (car smp) pos offset)
+							(cons 
+								(state-vertical-move (car smp) pos offset)
+								(cons
+									(state-make-move pos offset)
+									(cdr smp)))
+							#f))
+					offsets)
+				))
+		(filter ; gets all end positions
+			(lambda 
+				(pos)
+				(state-is-end? (car smp) pos))
+			positions)))))
 
-(define (moves-vertical-loop smp pos lst offset)
-	(begin ;(display "moves-vertical-loop ") (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
-	(if (= 0 offset)
-			(moves-vertical-loop smp pos lst (+ 1 offset))
-			(if (< offset 5)
-					(if (state-vertical-move (car smp) pos offset)
-							(moves-vertical-loop smp pos 
-								(cons 
-									(cons 
-										(state-vertical-move (car smp) pos offset) 
-										(cons 
-											(state-make-move pos offset) 
-											(cdr smp))) 
-									lst) 
-								(+ 1 offset))
-							(moves-vertical-loop smp pos lst (+ 1 offset)))
-					lst))))
+
+;
+;(define (moves smp)
+;	(begin ;(display "moves: ") (newline) (pretty-print (car smp)) (newline) (display (cdr smp)) (newline) (newline)
+;		(moves-outer-loop smp 0 '())))
+;
+;(define (moves-outer-loop smp pos lst)
+;	(begin ;(display "moves-outer-loop ")  (newline) (display (car smp)) (newline) (display (cdr smp)) (display pos) (newline) (display lst) (newline) (newline)
+;	(if (< pos 64)
+;			(if (state-is-end? (car smp) pos)
+;					(moves-outer-loop smp (+ 1 pos) ;cont lst below
+;						(if (state-is-horizontal? (car smp) pos)
+;								(moves-horizontal-loop smp pos lst -4)
+;								(if (state-is-vertical? (car smp) pos)
+;										(moves-vertical-loop smp pos lst -4)
+;										lst)))
+;					(moves-outer-loop smp (+ 1 pos) lst))
+;			lst)
+;	))
+;
+;(define (moves-horizontal-loop smp pos lst offset)
+;	(begin ;(display "moves-horizontal-loop ") (newline) (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
+;	(if (= 0 offset)
+;			(moves-horizontal-loop smp pos lst (+ 1 offset))
+;			(if (< offset 5)
+;					(if (state-horizontal-move (car smp) pos offset)
+;							(moves-horizontal-loop smp pos 
+;								(cons 
+;									(cons 
+;										(state-horizontal-move (car smp) pos offset) 
+;										(cons 
+;											(state-make-move pos offset) 
+;											(cdr smp))) 
+;									lst) 
+;								(+ 1 offset))
+;							(moves-horizontal-loop smp pos lst (+ 1 offset)))
+;					lst))))
+;
+;(define (moves-vertical-loop smp pos lst offset)
+;	(begin ;(display "moves-vertical-loop ") (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
+;	(if (= 0 offset)
+;			(moves-vertical-loop smp pos lst (+ 1 offset))
+;			(if (< offset 5)
+;					(if (state-vertical-move (car smp) pos offset)
+;							(moves-vertical-loop smp pos 
+;								(cons 
+;									(cons 
+;										(state-vertical-move (car smp) pos offset) 
+;										(cons 
+;											(state-make-move pos offset) 
+;											(cdr smp))) 
+;									lst) 
+;								(+ 1 offset))
+;							(moves-vertical-loop smp pos lst (+ 1 offset)))
+;					lst))))
 
 ;takes in a list of state-moves pairs and a list of previous states.
 ;finds all neighboring states
