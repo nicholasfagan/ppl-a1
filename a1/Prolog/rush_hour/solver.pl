@@ -2,46 +2,67 @@
 
 solve_puzzle(Puzzle, Moves) :-
 	puzzle_state(Puzzle,State),
-	search([State|[]],[],Moves).
+	search([[State|[]]],[],Moves).
 
-search([S|M], _, R) :-
+
+
+search([],_,[]) :-
+	write("No solution found."),nl.
+search(Prev,V,R) :-
+	is_sol(Prev,R)
+	;
+	next(Prev,V,Next, NextV),
+	search(Next,NextV,R).
+is_sol([[S|M]|SMPS],R) :-
 	state_is_solved(S),
-	reverse(M,[],R).
-search([S|M],V,R) :-
-	next([S|M],V,[NS,NM|M]),
-	search([NS,NM|M],[S|V], R).
+	reverse(M,[],R);
+	is_sol(SMPS,R).
 
-next([S|M], V, [NS,NM|M]) :-
-	valid_pos(S,0,Pos),
-	valid_offset(-4,Offset),
-	(horizontal_move(S,Pos,Offset,NS);
-		vertical_move(S,Pos,Offset,NS)),
-	\+ visited(NS, V),
-	pos_offset_move(Pos,Offset,NM).
+next(PrevS,V,NextS,NextV) :-
+	findall([S|M],moves(PrevS,S,M,V), NextS),
+	visit(NextS,V,NextV).
+
+moves(States,NewS,[NewMove|M],V) :-
+	in(States, [S|M]),
+	valid_pos(Pos),
+	valid_offset(Offset),
+	(	state_is_horizontal(S,Pos),
+		horizontal_move(S,Pos,Offset,NewS);
+		vertical_move(S,Pos,Offset,NewS)
+	),
+  \+ visited(NewS,V),
+	pos_offset_move(Pos,Offset,NewMove).
+
+valid_pos(P) :-
+	valid_pos(0,P).
+valid_pos(P,R) :-
+	P < 64,
+	(R is P;
+	NP is P+1,
+	valid_pos(NP,R)).
+
+valid_offset(O) :-
+	valid_offset(-4,O).
+valid_offset(0,R) :- valid_offset(1,R).
+valid_offset(O,R) :-
+	O < 5,
+	(R is O;
+	NO is O+1,
+	valid_offset(NO,R)).
 
 visited(S,[S|_]).
 visited(S,[_|VS]) :-
 	visited(S,VS).
 visited(S,S).
 
-
-valid_pos(S,P,R) :-
-	state_is_end(S,P),
-	R is P.
-valid_pos(S,P,R) :-
-	NP is P+1,
-	NP < 64,
-	valid_pos(S,NP,R).
-
-valid_offset(O,R) :-
-	O \= 0,
-	O < 5,
-	R is O.
-valid_offset(O,R) :-
-	NO is O+1,
-	NO < 5,
-	valid_offset(NO,R).
-
-
 reverse([],R,R).
 reverse([X|XS],L,R) :- reverse(XS,[X|L],R).
+
+visit([],V,V).
+visit([[S|_]|SMPS],V,NextV) :-
+	visit(SMPS,[S|V],NextV).
+
+
+in([[S|M]|_], [S|M]).
+in([_|SMPS], S) :- in(SMPS,S).
+
