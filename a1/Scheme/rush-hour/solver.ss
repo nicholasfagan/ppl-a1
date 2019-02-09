@@ -59,60 +59,6 @@
 			positions)))))
 
 
-;
-;(define (moves smp)
-;	(begin ;(display "moves: ") (newline) (pretty-print (car smp)) (newline) (display (cdr smp)) (newline) (newline)
-;		(moves-outer-loop smp 0 '())))
-;
-;(define (moves-outer-loop smp pos lst)
-;	(begin ;(display "moves-outer-loop ")  (newline) (display (car smp)) (newline) (display (cdr smp)) (display pos) (newline) (display lst) (newline) (newline)
-;	(if (< pos 64)
-;			(if (state-is-end? (car smp) pos)
-;					(moves-outer-loop smp (+ 1 pos) ;cont lst below
-;						(if (state-is-horizontal? (car smp) pos)
-;								(moves-horizontal-loop smp pos lst -4)
-;								(if (state-is-vertical? (car smp) pos)
-;										(moves-vertical-loop smp pos lst -4)
-;										lst)))
-;					(moves-outer-loop smp (+ 1 pos) lst))
-;			lst)
-;	))
-;
-;(define (moves-horizontal-loop smp pos lst offset)
-;	(begin ;(display "moves-horizontal-loop ") (newline) (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
-;	(if (= 0 offset)
-;			(moves-horizontal-loop smp pos lst (+ 1 offset))
-;			(if (< offset 5)
-;					(if (state-horizontal-move (car smp) pos offset)
-;							(moves-horizontal-loop smp pos 
-;								(cons 
-;									(cons 
-;										(state-horizontal-move (car smp) pos offset) 
-;										(cons 
-;											(state-make-move pos offset) 
-;											(cdr smp))) 
-;									lst) 
-;								(+ 1 offset))
-;							(moves-horizontal-loop smp pos lst (+ 1 offset)))
-;					lst))))
-;
-;(define (moves-vertical-loop smp pos lst offset)
-;	(begin ;(display "moves-vertical-loop ") (display smp) (newline) (display pos) (newline) (display lst) (newline) (display offset) (newline) (newline)
-;	(if (= 0 offset)
-;			(moves-vertical-loop smp pos lst (+ 1 offset))
-;			(if (< offset 5)
-;					(if (state-vertical-move (car smp) pos offset)
-;							(moves-vertical-loop smp pos 
-;								(cons 
-;									(cons 
-;										(state-vertical-move (car smp) pos offset) 
-;										(cons 
-;											(state-make-move pos offset) 
-;											(cdr smp))) 
-;									lst) 
-;								(+ 1 offset))
-;							(moves-vertical-loop smp pos lst (+ 1 offset)))
-;					lst))))
 
 ;takes in a list of state-moves pairs and a list of previous states.
 ;finds all neighboring states
