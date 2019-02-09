@@ -31,6 +31,10 @@ moves(States,NewS,[NewMove|M],V) :-
 		vertical_move(S,Pos,Offset,NewS)
 	),
   \+ visited(NewS,V),
+	%	length(V,L),
+	%	write("Lengh of visited: "),write(L),nl,
+	%write("Found New State: "),write(NewS),nl,nl,	
+	
 	pos_offset_move(Pos,Offset,NewMove).
 
 valid_pos(P) :-
@@ -50,18 +54,21 @@ valid_offset(O,R) :-
 	NO is O+1,
 	valid_offset(NO,R)).
 
-visited(S,[S|_]).
-visited(S,[_|VS]) :-
-	visited(S,VS).
-visited(S,S).
+%visited(S,[S|_]).
+%visited(S,[_|VS]) :-
+%	visited(S,VS).
+%visited(S,S).
+visited(S,L) :- member(S,L).
 
 reverse([],R,R).
 reverse([X|XS],L,R) :- reverse(XS,[X|L],R).
 
-visit([],V,V).
-visit([[S|_]|SMPS],V,NextV) :-
-	visit(SMPS,[S|V],NextV).
+visit(SMPS,OldV,NextV) :- 
+	strip_moves(SMPS,States),
+	append(States,OldV,NextV).
 
+strip_moves([],[]).
+strip_moves([[S|_]|SMPS],[S|R]) :- strip_moves(SMPS,R).
 
 in([[S|M]|_], [S|M]).
 in([_|SMPS], S) :- in(SMPS,S).
